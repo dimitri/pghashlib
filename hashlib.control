@@ -1,0 +1,5 @@
+# pg hashlib extension
+comment = 'stable hashes functions for PostgreSQL'
+default_version = '1.0'
+module_pathname = '$libdir/hashlib'
+relocatable = true

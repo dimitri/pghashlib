@@ -9,7 +9,8 @@ DOCS = README.hashlib
 
 EXTRA_CLEAN = README.hashlib README.html
 
-PGXS = $(shell pg_config --pgxs)
+PG_CONFIG = pg_config
+PGXS = $(shell $(PG_CONFIG) --pgxs)
 include $(PGXS)
 
 # docs: rename on install

@@ -1,0 +1,45 @@
+#!/usr/bin/make -f
+# -*- makefile -*-
+# Sample debian/rules that uses debhelper.
+# This file was originally written by Joey Hess and Craig Small.
+# As a special exception, when this file is copied by dh-make into a
+# dh-make output file, you may use that output file without restriction.
+# This special exception was added by Craig Small in version 0.37 of dh-make.
+
+# Uncomment this to turn on verbose mode.
+export DH_VERBOSE=1
+
+SRCDIR = $(CURDIR) # needed for pgxs_debian_control.mk
+PKGVERS = $(shell dpkg-parsechangelog | awk -F '[:-]' '/^Version:/ { print substr($$2, 2) }')
+EXCLUDE = --exclude-vcs --exclude=debian
+
+include /usr/share/postgresql-common/pgxs_debian_control.mk
+
+override_dh_auto_clean: debian/control
+	make clean
+	+pg_buildext clean $(CURDIR) build-%v
+	dh_clean 
+
+override_dh_auto_build:
+	# build all supported version
+	+pg_buildext build $(CURDIR) build-%v
+	for v in `pg_buildext supported-versions $(CURDIR)`; do \
+		cp uninstall_hashlib.sql build-$$v ;\
+	done
+
+override_dh_auto_install: 
+	# then install each of them
+	+pg_buildext install $(CURDIR) build-%v postgresql-%v-pghashlib
+	# cheap way to prepare for 9.1 extension without editing upstream Makefile
+	mv debian/postgresql-9.1-pghashlib/usr/share/postgresql/9.1/contrib debian/postgresql-9.1-pghashlib/usr/share/postgresql/9.1/extension
+	install hashlib.control debian/postgresql-9.1-pghashlib/usr/share/postgresql/9.1/extension
+	cp build-9.1/hashlib.sql debian/postgresql-9.1-pghashlib/usr/share/postgresql/9.1/extension/hashlib--1.0.sql
+
+override_dh_auto_test:
+	# don't run tests, that's make installcheck
+
+orig: clean
+	cd .. && tar czf pghashlib_$(PKGVERS).orig.tar.gz $(EXCLUDE) pghashlib
+
+%:
+	dh $@ 

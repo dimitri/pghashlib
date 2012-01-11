@@ -1,0 +1,9 @@
+build-8.4
+build-9.0
+build-9.1
+debian/postgresql-8.4-pghashlib
+debian/postgresql-8.4-pghashlib.*
+debian/postgresql-9.0-pghashlib
+debian/postgresql-9.0-pghashlib.*
+debian/postgresql-9.1-pghashlib
+debian/postgresql-9.1-pghashlib.*
